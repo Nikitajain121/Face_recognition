@@ -47,7 +47,7 @@ while True:
                     cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
 
                     # Extract the face region for prediction
-                    face_region = frame[y:y+height, x:x+width]
+                    face_region = frame[y:(y+height*1.2), x:(x+width*1.2)]
                     
                     # Resize the face region to the input size expected by the model
                     face_region = cv2.resize(face_region, (224, 224))

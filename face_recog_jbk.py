@@ -35,13 +35,22 @@ new_model.load_weights('model_weights3.h5', by_name=True)
 # print(new_model.summary())
 # predictions = new_model.predict(img_array)
 # print(predictions.shape)
+import cv2
 def preprocess_image(img_path):
-    img = cv2.imread(img_path)
-    img = image.load_img(img_path, target_size=(224, 224))
-    img_array = image.img_to_array(img)
-    img_array = img_array / 255.0
-    img_array = tf.expand_dims(img_array, 0)  # Add a batch dimension
-    return img_array
+    try:
+        print(f"Processing image at: {img_path}")
+        img = cv2.imread(img_path)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert to RGB
+        img = cv2.resize(img, (224, 224))  # Resize the image
+        img_array = img / 255.0
+        img_array = tf.expand_dims(img_array, 0)  # Add a batch dimension
+        return img_array
+    except Exception as e:
+        print(f"Error processing image at {img_path}: {e}")
+        return None
+    # except Exception as e:
+    #     print(f"Error processing image at {img_path}: {e}")
+    #     return None
 
 # Function to compute the Euclidean distance between two embeddings
 def euclidean_distance(vects):
@@ -70,14 +79,14 @@ def check_redundancy(base_image_path, other_image_paths, model):
     return distances
 
 # Example usage
-base_image_path = 'images/170f892c-6f12-11ec-90fd-dc4af0b7c0b9_1641488553386.jpg'
-other_image_folder = 'images/' 
 # Get a list of other image paths
-other_image_paths = [os.path.join(other_image_folder, filename) for filename in os.listdir(other_image_folder)]
+import os
+base_image_path = 'images_dataset_rns/Manu/Snapchat-1109357095.jpg'
+main_folder = 'images_dataset_rns/Manu/fotor_1700416953097.jpg'
 
-# Check redundancy and get distances
-distances = check_redundancy(base_image_path, other_image_paths, new_model)
+# Get a list of other image paths
+#other_image_paths = []
 
-# Print distances
-for i, distance in enumerate(distances):
-    print(f"Distance between image and image_{i}: {distance}")
+distance = check_redundancy(base_image_path, main_folder, new_model)
+            # Check redundancy and accumulate distances
+print(f"Distance between {base_image_path} and {main_folder}: {distance}")
