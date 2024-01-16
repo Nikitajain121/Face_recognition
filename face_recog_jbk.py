@@ -8,7 +8,7 @@ Original file is located at
 
 # Custom Model 1
 """
-
+import re
 import numpy as np
 import os
 import tensorflow as tf
@@ -18,7 +18,9 @@ import io
 from tensorflow.keras.models import load_model, Model
 from tensorflow.keras.preprocessing import image
 import pickle
-
+from tensorflow.keras import layers
+from tensorflow.keras import Model
+from tensorflow.keras.optimizers import Adam
 inv_map = None
 with open("inverse_mapping.pkl", "rb") as file:
     inv_map = pickle.load(file)
@@ -31,7 +33,24 @@ with open("y_data.npy", "rb") as file:
 model = load_model('model_weights3.h5')
 new_model = Model(inputs=model.input, outputs=model.layers[-5].output)
 # Load weights only till the last three layers
+for layer in new_model.layers:
+    layer.trainable = False
+
+# Create your new layers
+x = layers.Flatten()(new_model.output)
+x = layers.Dense(256, activation='relu')(x)
+x = layers.Dropout(0.5)(x)
+x = layers.Dense(4, activation='softmax')(x)  # Replace NUM_CLASSES with the number of your classes
+
 new_model.load_weights('model_weights3.h5', by_name=True)
+
+new_model2 = Model(new_model.input, x)
+
+# Compile the model
+new_model2.compile(optimizer=Adam(lr=0.0001), loss='categorical_crossentropy', metrics=['accuracy'])
+new_dataset = "images_dataset_rns"
+# Train the model on the new dataset
+new_model2.fit(new_dataset, epochs=10, batch_size=32)
 # print(new_model.summary())
 # predictions = new_model.predict(img_array)
 # print(predictions.shape)
@@ -56,7 +75,7 @@ def preprocess_image(img_path):
 def euclidean_distance(vects):
     x, y = vects
     sum_square = tf.reduce_sum(tf.square(x - y), axis=1, keepdims=True)
-    return tf.sqrt(tf.maximum(sum_square, tf.keras.backend.epsilon()))
+    return (tf.maximum(sum_square, tf.keras.backend.epsilon()))
 
 # Function to check redundancy using Siamese network
 def check_redundancy(base_image_path, other_image_paths, model):
@@ -68,10 +87,16 @@ def check_redundancy(base_image_path, other_image_paths, model):
     distances = []
 
     for image_path in other_image_paths:
+        if image_path == 'images_dataset_rns/Nikita/.DS_Store':
+                continue
         # Preprocess other images
         other_img_array = preprocess_image(image_path)
         other_embedding = model.predict(other_img_array)
+        print(f"Processing image at: {image_path}")
 
+        if other_img_array is None:
+            print(f"Error processing image at: {image_path}")
+            continue
         # Compute the Euclidean distance between the embeddings
         distance = euclidean_distance([base_embedding, other_embedding])
         distances.append(distance.numpy())
@@ -81,12 +106,21 @@ def check_redundancy(base_image_path, other_image_paths, model):
 # Example usage
 # Get a list of other image paths
 import os
-base_image_path = 'images_dataset_rns/Manu/Snapchat-1109357095.jpg'
-main_folder = 'images_dataset_rns/Manu/fotor_1700416953097.jpg'
+base_image_path = 'images_dataset_rns/Nikita/IMG_20171111_190322.jpg'
+main_folder = 'images_dataset_rns/Dinesh/'
 
 # Get a list of other image paths
-#other_image_paths = []
+other_image_paths = []
 
-distance = check_redundancy(base_image_path, main_folder, new_model)
-            # Check redundancy and accumulate distances
-print(f"Distance between {base_image_path} and {main_folder}: {distance}")
+# Iterate through images in the main folder
+for filename in os.listdir(main_folder):
+    image_path = os.path.join(main_folder, filename)
+    other_image_paths.append(image_path)
+    if image_path == 'images_dataset_rns/Nikita/.DS_Store':
+                continue
+# Check redundancy and accumulate distances
+distances = check_redundancy(base_image_path, other_image_paths, new_model)
+print(sum(distances)/len(distances))
+# Print distances
+for i, distance in enumerate(distances):
+    print(f"Distance between {base_image_path} and {other_image_paths[i]}: {distance}")
