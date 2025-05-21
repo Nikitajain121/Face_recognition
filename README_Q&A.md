@@ -174,3 +174,66 @@ The code uses OpenCV's `cv2.getRotationMatrix2D` to create an affine transformat
 - Add command-line arguments to control saving options and duration.  
 - Integrate with a face recognition pipeline for immediate use after alignment.
 
+# Interview Questions and Answers Based on augment.py (Image Data Augmentation Script)
+
+### 1. What is the purpose of `ImageDataGenerator` in TensorFlow/Keras?
+
+**Answer:**  
+`ImageDataGenerator` is a utility that allows real-time data augmentation on image datasets. It generates batches of tensor image data with real-time augmentation such as rescaling, rotation, shear, zoom, and flipping, which helps improve model generalization by artificially enlarging the training dataset.
+
+---
+
+### 2. How does the code differentiate between training and testing data augmentation?
+
+**Answer:**  
+- For **training data** (`train_datagen`), several augmentations are applied such as rescaling, shear, zoom, and horizontal flip to increase data diversity.  
+- For **testing/validation data** (`test_datagen`), only rescaling is applied, without augmentations, to evaluate the model on unaltered data.
+
+---
+
+### 3. What does `flow_from_directory` do?
+
+**Answer:**  
+`flow_from_directory` generates batches of augmented data from images stored in a directory structure where subdirectories represent class labels. It reads images, applies augmentations, resizes them, and labels them automatically according to their folder names.
+
+---
+
+### 4. Why is the `save_to_dir` argument used in `flow_from_directory`?
+
+**Answer:**  
+`save_to_dir` saves the augmented images generated on-the-fly to the specified directory. This can be useful for visualizing augmented images or for reusing augmented images without regenerating them each time.
+
+---
+
+### 5. What is the significance of `class_mode='binary'` in the generators?
+
+**Answer:**  
+`class_mode='binary'` indicates that the dataset is for binary classification (two classes). The labels generated will be either 0 or 1. For multi-class classification, `class_mode='categorical'` would be used.
+
+---
+
+### 6. How does the code obtain the list of class folders dynamically?
+
+**Answer:**  
+It lists all directories inside the `images_dataset_rns/Training` directory using `os.listdir()` combined with `os.path.isdir()` to filter only directories, which correspond to the class labels.
+
+---
+
+### 7. Explain the purpose of this block:
+Answer:
+This creates a dictionary mapping numerical indices to class names, which helps interpret model output indices as human-readable class labels.
+class_names = {index: class_name for index, class_name in enumerate(class_folders)}
+
+8. How does the script generate augmented images for each class folder separately?  
+**Answer:** Inside the loop over class_folders, it creates a train_generator that loads images from the entire training directory but saves augmented images back into the respective class folder using save_to_dir=f'images_dataset_rns/Training/{class_folder}'. This saves augmented images alongside original images per class.
+
+9. What does the call to train_generator.next() return?  
+**Answer:** train_generator.next() returns one batch of augmented images and their labels. Since batch_size=1, it returns one image and its label, packed as a tuple (images, labels).
+
+10. What improvements can be made to this code for efficiency?  
+**Answer:**  
+- Avoid creating a new generator for each class inside the loop since it loads from the entire training directory each time. Instead, create one generator for all classes.  
+- If saving augmented images, better separate augmentation and saving phases to avoid redundancy.  
+- Use larger batch sizes for faster generation.  
+- Add error handling to check for empty folders or invalid image files.  
+- Consider shuffling data and setting seed for reproducibility.
