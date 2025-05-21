@@ -37,32 +37,32 @@ Clone the repository:
 git clone https://github.com/Nikitajain121/Face_recognition.git
 cd Face_recognition
 
-# Create and activate a virtual environment (Linux/macOS)
+## Create and activate a virtual environment (Linux/macOS)
 python -m venv venv
 source venv/bin/activate
 
-# For Windows PowerShell, use:
-# venv\Scripts\Activate.ps1
+## For Windows PowerShell, use:
+## venv\Scripts\Activate.ps1
 
-# For Windows CMD, use:
-# venv\Scripts\activate.bat
+## For Windows CMD, use:
+## venv\Scripts\activate.bat
 
-# Install dependencies from requirements.txt
+## Install dependencies from requirements.txt
 pip install -r requirements.txt
 
-# If requirements.txt is missing, install main packages manually
+## If requirements.txt is missing, install main packages manually
 pip install tensorflow mtcnn opencv-python numpy
 
-# Run face recognition on an image or video
+## Run face recognition on an image or video
 python face_recog_jbk.py --input path/to/image_or_video
 
-# Run real-time face recognition using webcam
+## Run real-time face recognition using webcam
 python wireless_vdo.py
 
-# Align dataset images
+## Align dataset images
 python align.py
 
-# Augment dataset images
+## Augment dataset images
 python augment.py
 
 
