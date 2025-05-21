@@ -336,4 +336,44 @@ A: Using `np.argmax(predictions)` to find the class index with highest probabili
 **Q10: How to handle errors like empty folders or invalid images?**  
 A: Use try-except blocks around file and image operations and validate folder contents before processing.
 
+### Important Q&A for Your Face Recognition Script
+
+**Q1: What is MTCNN used for?**  
+A: MTCNN detects faces in images by returning bounding boxes around faces, helping localize regions for recognition.
+
+**Q2: Why normalize images by dividing by 255?**  
+A: To scale pixel values from [0,255] to [0,1], which helps neural networks train and predict better.
+
+**Q3: Why add a batch dimension with `tf.expand_dims(img_array, 0)`?**  
+A: Models expect inputs shaped `(batch_size, height, width, channels)`; adding batch dimension for a single image ensures compatibility.
+
+**Q4: What is `inv_map`?**  
+A: A dictionary mapping model output indices (e.g., 0,1,2) back to human-readable class labels.
+
+**Q5: How does DeepFace find matches in a database?**  
+A: It generates face embeddings with a pretrained model and compares vector distances (e.g., Euclidean) to find similar faces.
+
+**Q6: Why extract the face region with extra margin (1.2x)?**  
+A: To include context like chin or hair, improving recognition accuracy.
+
+**Q7: What problems occur if face coordinates exceed image bounds?**  
+A: It can cause errors or empty arrays during cropping; always clip coordinates within image dimensions.
+
+**Q8: Why is `DeepFace.find()` slow for real-time use?**  
+A: Because it compares embeddings against many database images, which is computationally heavy.
+
+**Q9: How to improve real-time face recognition performance?**  
+A: Process every few frames, use lightweight models, cache known faces, and use GPU acceleration.
+
+**Q10: What does `cv2.waitKey(1) & 0xFF == ord("q")` do?**  
+A: Waits 1 ms for a key press; if 'q' is pressed, it stops the video loop.
+
+**Q11: How to save detected faces separately?**  
+A: Crop the face region, resize it, then save with `cv2.imwrite()` or PIL's `.save()`.
+
+**Q12: How to display predicted labels on video frames?**  
+A: Use `cv2.putText()` to overlay text near the face bounding box, e.g.:  
+```python
+cv2.putText(frame, f"{top_class_label} {confidence_score:.2f}", (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,255,0), 2)
+
 
