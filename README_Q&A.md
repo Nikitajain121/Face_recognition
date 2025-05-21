@@ -87,3 +87,90 @@ Deep learning models expect inputs to have a batch dimension, typically shape `(
 **Answer:**  
 - **Face verification:** Compute embeddings of two face images and measure the Euclidean distance. If the distance is below a threshold, the faces match.  
 - **Face identification:** Compute embeddings for a query face and compare against a database of known face embeddings, choosing the closest match using distance metrics.
+
+- # Interview Questions and Answers Based on align.py (Face Alignment Script)
+
+### 1. What is the purpose of the `align_face` function in this code?
+
+**Answer:**  
+The `align_face` function aligns a detected face in an image by rotating and scaling it so that the eyes are positioned at fixed, predefined locations. This normalization helps improve face recognition accuracy by standardizing the face orientation and size before further processing.
+
+---
+
+### 2. How does the script calculate the angle to rotate the face for alignment?
+
+**Answer:**  
+It calculates the angle between the left and right eyes using their coordinates from landmarks:  
+- Compute horizontal (`dX`) and vertical (`dY`) differences between eyes.  
+- Calculate the angle using `np.arctan2(dY, dX)`, converting it to degrees.  
+- Then, adjust the rotation by subtracting the desired eye angle so the eyes align horizontally.
+
+---
+
+### 3. Why is the scale factor computed and applied during alignment?
+
+**Answer:**  
+The scale factor ensures the distance between the eyes in the aligned face matches a desired fixed distance (`desired_dist`). This scales the face to a consistent size, which is crucial for reliable face recognition.
+
+---
+
+### 4. What role does MTCNN play in this script?
+
+**Answer:**  
+MTCNN (Multi-task Cascaded Convolutional Networks) is used to detect faces and facial landmarks (eyes, nose, mouth) in the video frames captured from the webcam. The landmarks are essential to perform accurate face alignment.
+
+---
+
+### 5. How does the script capture and process video frames?
+
+**Answer:**  
+- Opens the webcam using `cv2.VideoCapture(0)`.  
+- Reads frames in a loop.  
+- Detects faces and landmarks using MTCNN in each frame.  
+- Aligns each detected face and displays it.  
+- Draws bounding boxes around detected faces on the original frame.  
+- Saves both the aligned faces and the original frames as images.  
+- Stops after 3 seconds of capture.
+
+---
+
+### 6. What are the potential reasons for the webcam failing to open and how does the code handle it?
+
+**Answer:**  
+Potential reasons include no webcam connected, driver issues, or permission restrictions.  
+The code checks if `cap.isOpened()` returns `False` and prints an error message before exiting gracefully.
+
+---
+
+### 7. How does the code ensure the alignment transformation is applied correctly?
+
+**Answer:**  
+The code uses OpenCV's `cv2.getRotationMatrix2D` to create an affine transformation matrix for rotation and scaling centered at the left eye coordinates. It then applies this matrix with `cv2.warpAffine` to the whole frame.
+
+---
+
+### 8. Why are faces saved in two forms: aligned faces and original frames?
+
+**Answer:**  
+- **Aligned faces** are cropped and normalized versions intended for training or inference in face recognition models.  
+- **Original frames** with bounding boxes provide visual feedback for detection and help in debugging or data inspection.
+
+---
+
+### 9. Explain why the script uses `cv2.imshow` and what limitation it has in this context.
+
+**Answer:**  
+`cv2.imshow` displays the processed images in windows for real-time visualization.  
+**Limitation:** It requires a GUI environment to display windows and may not work in headless servers or some IDEs like Jupyter without additional setup.
+
+---
+
+### 10. How can this face alignment code be improved for better performance or usability?
+
+**Answer:**  
+- Add exception handling around face detection and alignment steps.  
+- Process and save only cropped face regions instead of whole frames for aligned faces.  
+- Optimize for batch processing or asynchronous capture.  
+- Add command-line arguments to control saving options and duration.  
+- Integrate with a face recognition pipeline for immediate use after alignment.
+
