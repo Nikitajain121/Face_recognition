@@ -237,3 +237,48 @@ class_names = {index: class_name for index, class_name in enumerate(class_folder
 - Use larger batch sizes for faster generation.  
 - Add error handling to check for empty folders or invalid image files.  
 - Consider shuffling data and setting seed for reproducibility.
+
+-  ### Face Recognition Webcam Script - Interview Q&A
+
+**1. What is the purpose of `inverse_mapping.pkl` in this script?**  
+It stores a dictionary that maps numeric class indices (model output) back to human-readable class labels, enabling interpretation of prediction results.
+
+**2. How is the pre-trained model loaded and used?**  
+The model is loaded via `load_model('model_weights3.h5')`. Each webcam frame is preprocessed and passed to `model.predict()` to generate class probabilities.
+
+**3. How is the webcam video stream captured and displayed?**  
+Using `cv2.VideoCapture(0)` to open the default camera, frames are read in a loop with `cap.read()` and displayed using `cv2.imshow("Webcam", frame)`.
+
+**4. How are frames preprocessed before prediction?**  
+Frames are resized to (224,224), converted to arrays, normalized by dividing by 255, and expanded with a batch dimension via `tf.expand_dims` to fit model input shape.
+
+**5. What does `np.argmax(predictions)` do?**  
+It selects the index of the class with the highest predicted probability, representing the model's predicted label.
+
+**6. How are predicted labels interpreted in human-readable form?**  
+By using the inverse mapping dictionary loaded from `inverse_mapping.pkl`, which maps numeric indices to label names.
+
+**7. How does the script save captured images?**  
+Each frame is saved as a JPEG file in a specified directory using `cv2.imwrite()` with filenames like `"image_0.jpg"`, `"image_1.jpg"`, etc.
+
+**8. How can the user exit the webcam loop before capturing 10 images?**  
+By pressing the 'k' key, detected via `cv2.waitKey(1000) & 0xFF == ord('k')`.
+
+**9. What is the purpose of `cv2.waitKey(1000)`?**  
+It waits for 1000 milliseconds (1 second) between frames, controlling the frame rate and allowing keypress detection.
+
+**10. How does the script display captured frames within a Jupyter notebook?**  
+Using `cv2.imencode()` to encode the frame to JPEG bytes, then displaying with `IPython.display.Image`.
+
+**11. Suggest improvements for this code.**  
+- Use relative or configurable paths for saving images to enhance portability.  
+- Add exception handling for camera access, model loading, and file I/O.  
+- Allow configurable batch sizes or continuous streaming instead of fixed 10 frames.  
+- Improve exit conditions with multiple key options (e.g., 'q' or ESC).  
+- Optimize preprocessing to match the exact training pipeline.  
+- Avoid redundant display in non-notebook environments.
+
+---
+
+This concise Q&A covers the main components and best practices of the webcam face recognition script.
+
