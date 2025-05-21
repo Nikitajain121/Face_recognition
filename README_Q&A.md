@@ -282,3 +282,58 @@ Using `cv2.imencode()` to encode the frame to JPEG bytes, then displaying with `
 
 This concise Q&A covers the main components and best practices of the webcam face recognition script.
 
+# Q&A on Face Recognition & Augmentation Script
+
+**Q1: What does the `class_names` dictionary represent?**  
+A: It maps numerical indices (0, 1, 2, ...) to class folder names, helping interpret model output indices as human-readable labels.
+
+---
+
+**Q2: How does the script detect faces in video frames?**  
+A: It uses the MTCNN detector (`detector = MTCNN()`) to find face bounding boxes in each frame.
+
+---
+
+**Q3: How are detected face images preprocessed before prediction?**  
+A: Faces are resized to 224x224, normalized by dividing pixel values by 255, and expanded with a batch dimension for the model input.
+
+---
+
+**Q4: Why freeze layers in the loaded model and add new Dense layers?**  
+A: To leverage pretrained features (transfer learning) and adapt the model to new classes by training only new layers.
+
+---
+
+**Q5: How does the script generate and save augmented images?**  
+A: Using `train_generator` from `ImageDataGenerator` to create batches of augmented images, convert them to PIL format, and save in class-specific folders.
+
+---
+
+**Q6: Why use `class_mode='categorical'` in the `train_generator`?**  
+A: To get one-hot encoded labels necessary for multi-class classification and extracting labels via `argmax()`.
+
+---
+
+**Q7: How to improve the video face detection loop?**  
+A:  
+- Initialize MTCNN once outside the loop.  
+- Add boundary checks on face coordinates.  
+- Batch predict multiple faces.  
+- Use shorter `cv2.waitKey()` delays for smoother display.
+
+---
+
+**Q8: What if variables like `train_generator`, `batch_size`, or `new_dataset` are undefined?**  
+A: Initialize them properly before use; for example, create `train_generator` via `ImageDataGenerator.flow_from_directory()` and ensure `new_dataset` folder exists.
+
+---
+
+**Q9: How is the prediction label retrieved?**  
+A: Using `np.argmax(predictions)` to find the class index with highest probability, then mapping it to class name via `class_names`.
+
+---
+
+**Q10: How to handle errors like empty folders or invalid images?**  
+A: Use try-except blocks around file and image operations and validate folder contents before processing.
+
+
